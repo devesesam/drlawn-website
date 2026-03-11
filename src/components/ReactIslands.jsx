@@ -247,8 +247,14 @@ export const Protocol = () => {
   useGSAP(() => {
     const cards = gsap.utils.toArray('.protocol-card');
     
-    // We pin the container instead of individual elements 
-    // to prevent subsequent elements (footer) from overlapping during the animation.
+    // Set explicit starting z-indexes and move cards 2 & 3 completely offscreen
+    cards.forEach((card, i) => {
+      gsap.set(card, { zIndex: i + 1 });
+      if (i !== 0) {
+        gsap.set(card, { yPercent: 100 });
+      }
+    });
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container.current,
@@ -260,15 +266,21 @@ export const Protocol = () => {
     });
 
     cards.forEach((card, index) => {
-      if (index === cards.length - 1) return; // Don't dim the last card
-      
+      if (index === 0) return; 
+
+      // Animate current card coming up from bottom
       tl.to(card, {
+        yPercent: 0,
+        ease: 'none',
+      });
+
+      // Concurrently animate the previous card receding into the background
+      tl.to(cards[index - 1], {
         scale: 0.9,
-        opacity: 0.5,
+        opacity: 0.3, // Deepened the fade for better overlapping contrast
         filter: 'blur(10px)',
         ease: 'none',
-        duration: 1, // Normalized duration inside the scrubbed timeline
-      }, `+=${0.5}`); // Slight pause between stacking cards
+      }, '<');
     });
 
   }, { scope: container });
