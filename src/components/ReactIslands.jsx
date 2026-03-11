@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -7,7 +7,7 @@ import { ArrowUpRight, Leaf, Activity, MousePointer2 } from 'lucide-react';
 gsap.registerPlugin(ScrollTrigger);
 
 // --- 1. NAVBAR ---
-const Navbar = () => {
+export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const Navbar = () => {
 };
 
 // --- 2. HERO SECTION ---
-const Hero = () => {
+export const Hero = () => {
   const container = useRef(null);
 
   useGSAP(() => {
@@ -81,7 +81,7 @@ const Hero = () => {
 };
 
 // --- FEATURE 1: Diagnostic Shuffler ---
-const ShufflerCard = () => {
+export const ShufflerCard = () => {
   const [cards, setCards] = useState([
     { id: 1, title: 'Nutrient Optimisation', val: '98%' },
     { id: 2, title: 'Root Deepening', val: '+40mm' },
@@ -137,7 +137,7 @@ const ShufflerCard = () => {
 };
 
 // --- FEATURE 2: Telemetry Typewriter ---
-const TypewriterCard = () => {
+export const TypewriterCard = () => {
   const [text, setText] = useState('');
   const fullText = "Initiating lawn rescue protocol... \nAnalyzing soil pH... \nDetecting pathogen stress... \nDeploying corrective bio-agents... \nRestoration sequence active.";
   
@@ -167,7 +167,7 @@ const TypewriterCard = () => {
 };
 
 // --- FEATURE 3: Cursor Protocol Scheduler ---
-const SchedulerCard = () => {
+export const SchedulerCard = () => {
   const containerRef = useRef(null);
   
   useGSAP(() => {
@@ -206,33 +206,7 @@ const SchedulerCard = () => {
   );
 };
 
-// --- 3. FEATURES SECTION ---
-const Features = () => {
-  return (
-    <section id="features" className="py-32 px-8 md:px-16 w-full max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="flex flex-col gap-6">
-          <h3 className="font-sans font-bold text-2xl">Premium lawn growth.</h3>
-          <p className="text-primary/60 text-sm">Engineered density and colour optimization for luxury residential turf.</p>
-          <ShufflerCard />
-        </div>
-        <div className="flex flex-col gap-6">
-          <h3 className="font-sans font-bold text-2xl">Lawn rescue and care.</h3>
-          <p className="text-primary/60 text-sm">Systematic eradication of pathogens, weeds, and compacted soil trauma.</p>
-          <TypewriterCard />
-        </div>
-        <div className="flex flex-col gap-6">
-          <h3 className="font-sans font-bold text-2xl">Soil tests & limits.</h3>
-          <p className="text-primary/60 text-sm">Comprehensive biological profiling shaping custom fertiliser programs.</p>
-          <SchedulerCard />
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// --- 4. PHILOSOPHY ---
-const Philosophy = () => {
+export const Philosophy = () => {
   const container = useRef(null);
 
   useGSAP(() => {
@@ -266,180 +240,132 @@ const Philosophy = () => {
   );
 };
 
-// --- 5. PROTOCOL (Sticky Stacking Archive) ---
-const Protocol = () => {
+// --- FIX: Stacking Archive Scroll Overlap Bug Resolved via master-pinning
+export const Protocol = () => {
   const container = useRef(null);
 
   useGSAP(() => {
     const cards = gsap.utils.toArray('.protocol-card');
     
+    // We pin the container instead of individual elements 
+    // to prevent subsequent elements (footer) from overlapping during the animation.
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container.current,
+        start: 'top top',
+        end: `+=${cards.length * 100}%`,
+        pin: true,
+        scrub: 1,
+      }
+    });
+
     cards.forEach((card, index) => {
       if (index === cards.length - 1) return; // Don't dim the last card
       
-      ScrollTrigger.create({
-        trigger: card,
-        start: 'top top',
-        end: 'bottom top',
-        endTrigger: '.protocol-container',
-        pin: true,
-        pinSpacing: false,
-        scrub: true,
-        animation: gsap.to(card, {
-          scale: 0.9,
-          opacity: 0.5,
-          filter: 'blur(10px)',
-          ease: 'none'
-        })
-      });
+      tl.to(card, {
+        scale: 0.9,
+        opacity: 0.5,
+        filter: 'blur(10px)',
+        ease: 'none',
+        duration: 1, // Normalized duration inside the scrubbed timeline
+      }, `+=${0.5}`); // Slight pause between stacking cards
     });
+
   }, { scope: container });
 
   return (
-    <section id="protocol" ref={container} className="protocol-container relative w-full pt-16 pb-32">
-      {/* Background layer for cards */}
-      <div className="protocol-card h-screen w-full flex items-center justify-center sticky top-0 px-6">
-        <div className="w-full max-w-6xl h-[80vh] bg-surface border border-muted rounded-[3rem] p-12 md:p-24 flex flex-col md:flex-row items-center gap-16 shadow-2xl relative overflow-hidden">
-          <div className="flex-1 z-10">
-            <span className="font-mono text-accent text-lg mb-4 block">01</span>
-            <h2 className="font-sans font-bold text-4xl md:text-6xl mb-6">Soil Architecture.</h2>
-            <p className="text-primary/70 text-lg max-w-md text-balance">Deep analysis of your turf's micro-biome to establish a baseline for biological correction.</p>
+    <section id="protocol" className="relative w-full pt-16">
+       <div ref={container} className="protocol-container h-screen w-full relative overflow-hidden">
+        {/* Card 1 */}
+        <div className="protocol-card absolute inset-0 w-full flex items-center justify-center px-6">
+          <div className="w-full max-w-6xl h-[80vh] bg-surface border border-muted rounded-[3rem] p-12 md:p-24 flex flex-col md:flex-row items-center gap-16 shadow-2xl relative overflow-hidden">
+            <div className="flex-1 z-10">
+              <span className="font-mono text-accent text-lg mb-4 block">01</span>
+              <h2 className="font-sans font-bold text-4xl md:text-6xl mb-6">Soil Architecture.</h2>
+              <p className="text-primary/70 text-lg max-w-md text-balance">Deep analysis of your turf's micro-biome to establish a baseline for biological correction.</p>
+            </div>
+            <div className="flex-1 h-full w-full relative min-h-[300px]">
+              {/* Rotating Geometric Motif */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-80 mix-blend-screen">
+                <svg viewBox="0 0 100 100" className="w-full h-full max-w-[400px] animate-[spin_20s_linear_infinite]">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#4A7C59" strokeWidth="0.5" strokeDasharray="2 4" />
+                  <circle cx="50" cy="50" r="30" fill="none" stroke="#2A332A" strokeWidth="1" />
+                  <path d="M50 10 L50 90 M10 50 L90 50 M22 22 L78 78 M22 78 L78 22" stroke="#4A7C59" strokeWidth="0.2" />
+                </svg>
+              </div>
+            </div>
           </div>
-          <div className="flex-1 h-full w-full relative min-h-[300px]">
-            {/* Rotating Geometric Motif */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-80 mix-blend-screen">
-              <svg viewBox="0 0 100 100" className="w-full h-full max-w-[400px] animate-[spin_20s_linear_infinite]">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#4A7C59" strokeWidth="0.5" strokeDasharray="2 4" />
-                <circle cx="50" cy="50" r="30" fill="none" stroke="#2A332A" strokeWidth="1" />
-                <path d="M50 10 L50 90 M10 50 L90 50 M22 22 L78 78 M22 78 L78 22" stroke="#4A7C59" strokeWidth="0.2" />
+        </div>
+
+        {/* Card 2 -> FIX: Refined scanning animation via translation rather than top spacing */}
+        <div className="protocol-card absolute inset-0 w-full flex items-center justify-center px-6">
+          <div className="w-full max-w-6xl h-[80vh] bg-[#0A0D0A] border border-muted rounded-[3rem] p-12 md:p-24 flex flex-col md:flex-row items-center gap-16 shadow-2xl relative overflow-hidden">
+            <div className="flex-1 z-10">
+              <span className="font-mono text-accent text-lg mb-4 block">02</span>
+              <h2 className="font-sans font-bold text-4xl md:text-6xl mb-6">Targeted Nutrition.</h2>
+              <p className="text-primary/70 text-lg max-w-md text-balance">Custom fertiliser blends engineered specifically for the distinct microclimates of Nelson/Tasman.</p>
+            </div>
+            <div className="flex-1 h-full w-full relative min-h-[300px]">
+              {/* Scanning Laser -> Fixed Glitch */}
+              <div className="absolute inset-0 flex items-center justify-center p-8">
+                 <div className="w-full h-full relative border border-muted/30 grid grid-cols-10 grid-rows-10 gap-1 p-2 overflow-hidden">
+                   {Array.from({ length: 100 }).map((_, i) => (
+                     <div key={i} className="bg-muted/10 rounded-sm"></div>
+                   ))}
+                   <div className="absolute top-0 left-0 w-full h-[2px] bg-accent shadow-[0_0_15px_#4A7C59]" 
+                     style={{ 
+                       animation: 'smooth-scan 4s linear infinite'
+                     }}>
+                   </div>
+                 </div>
+                 <style>{`
+                   @keyframes smooth-scan {
+                     0% { transform: translateY(-10px); opacity: 0; }
+                     5% { opacity: 1; }
+                     95% { opacity: 1; }
+                     100% { transform: translateY(105%); opacity: 0; }
+                   }
+                 `}</style>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3 */}
+        <div className="protocol-card absolute inset-0 w-full flex items-center justify-center px-6">
+          <div className="w-full max-w-6xl h-[80vh] bg-surface border border-muted rounded-[3rem] p-12 md:p-24 flex flex-col md:flex-row items-center gap-16 shadow-2xl relative overflow-hidden">
+            <div className="flex-1 z-10">
+              <span className="font-mono text-accent text-lg mb-4 block">03</span>
+              <h2 className="font-sans font-bold text-4xl md:text-6xl mb-6">Sustained Vitality.</h2>
+              <p className="text-primary/70 text-lg max-w-md text-balance">Ongoing precision maintenance ensuring resilient, premium growth year-round.</p>
+            </div>
+            <div className="flex-1 h-full w-full relative min-h-[300px] flex items-center justify-center">
+              {/* EKG Waveform */}
+              <svg viewBox="0 0 200 100" className="w-full max-w-[400px] drop-shadow-[0_0_8px_rgba(74,124,89,0.5)]">
+                 <path 
+                   d="M 0 50 L 40 50 L 50 20 L 60 80 L 70 50 L 130 50 L 140 30 L 150 70 L 160 50 L 200 50" 
+                   fill="none" 
+                   stroke="#4A7C59" 
+                   strokeWidth="2" 
+                   className="path-anim"
+                 />
+                 <style>{`
+                   .path-anim {
+                     stroke-dasharray: 400;
+                     stroke-dashoffset: 400;
+                     animation: draw 3s ease-in-out infinite;
+                   }
+                   @keyframes draw {
+                     0% { stroke-dashoffset: 400; }
+                     50% { stroke-dashoffset: 0; }
+                     100% { stroke-dashoffset: -400; }
+                   }
+                 `}</style>
               </svg>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="protocol-card h-screen w-full flex items-center justify-center sticky top-0 px-6">
-        <div className="w-full max-w-6xl h-[80vh] bg-[#0A0D0A] border border-muted rounded-[3rem] p-12 md:p-24 flex flex-col md:flex-row items-center gap-16 shadow-2xl relative overflow-hidden">
-          <div className="flex-1 z-10">
-            <span className="font-mono text-accent text-lg mb-4 block">02</span>
-            <h2 className="font-sans font-bold text-4xl md:text-6xl mb-6">Targeted Nutrition.</h2>
-            <p className="text-primary/70 text-lg max-w-md text-balance">Custom fertiliser blends engineered specifically for the distinct microclimates of Nelson/Tasman.</p>
-          </div>
-          <div className="flex-1 h-full w-full relative min-h-[300px]">
-            {/* Scanning Laser */}
-            <div className="absolute inset-0 flex items-center justify-center p-8">
-               <div className="w-full h-full relative border border-muted/30 grid grid-cols-10 grid-rows-10 gap-1 p-2">
-                 {Array.from({ length: 100 }).map((_, i) => (
-                   <div key={i} className="bg-muted/10 rounded-sm"></div>
-                 ))}
-                 <div className="absolute top-0 left-0 w-full h-[2px] bg-accent shadow-[0_0_15px_#4A7C59] animate-[ping_3s_linear_infinite]" style={{ animationDuration: '4s', animationName: 'scan' }}></div>
-               </div>
-               <style>{`
-                 @keyframes scan {
-                   0% { top: 0; opacity: 1; }
-                   90% { top: 100%; opacity: 1; }
-                   100% { top: 100%; opacity: 0; }
-                 }
-               `}</style>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="protocol-card h-screen w-full flex items-center justify-center sticky top-0 px-6">
-        <div className="w-full max-w-6xl h-[80vh] bg-surface border border-muted rounded-[3rem] p-12 md:p-24 flex flex-col md:flex-row items-center gap-16 shadow-2xl relative overflow-hidden">
-          <div className="flex-1 z-10">
-            <span className="font-mono text-accent text-lg mb-4 block">03</span>
-            <h2 className="font-sans font-bold text-4xl md:text-6xl mb-6">Sustained Vitality.</h2>
-            <p className="text-primary/70 text-lg max-w-md text-balance">Ongoing precision maintenance ensuring resilient, premium growth year-round.</p>
-          </div>
-          <div className="flex-1 h-full w-full relative min-h-[300px] flex items-center justify-center">
-            {/* EKG Waveform */}
-            <svg viewBox="0 0 200 100" className="w-full max-w-[400px] drop-shadow-[0_0_8px_rgba(74,124,89,0.5)]">
-               <path 
-                 d="M 0 50 L 40 50 L 50 20 L 60 80 L 70 50 L 130 50 L 140 30 L 150 70 L 160 50 L 200 50" 
-                 fill="none" 
-                 stroke="#4A7C59" 
-                 strokeWidth="2" 
-                 className="path-anim"
-               />
-               <style>{`
-                 .path-anim {
-                   stroke-dasharray: 400;
-                   stroke-dashoffset: 400;
-                   animation: draw 3s ease-in-out infinite;
-                 }
-                 @keyframes draw {
-                   0% { stroke-dashoffset: 400; }
-                   50% { stroke-dashoffset: 0; }
-                   100% { stroke-dashoffset: -400; }
-                 }
-               `}</style>
-            </svg>
           </div>
         </div>
       </div>
     </section>
   );
 };
-
-// --- 6. CTA & FOOTER ---
-const Footer = () => {
-  return (
-    <>
-      <section id="contact" className="py-32 px-8 flex flex-col items-center justify-center text-center">
-        <h2 className="font-drama italic text-5xl md:text-7xl mb-12">Begin your lawn transformation.</h2>
-        <a href="mailto:hello@drlawn.co.nz" className="relative overflow-hidden group bg-primary text-background hover:text-white px-12 py-5 rounded-full text-lg font-bold transition-transform transform hover:scale-[1.03] duration-300">
-          <span className="relative z-10 flex items-center gap-3">Get in touch <ArrowUpRight size={20} /></span>
-          <div className="absolute inset-0 bg-accent translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
-        </a>
-      </section>
-
-      <footer className="bg-dark rounded-t-[4rem] px-8 md:px-16 pt-24 pb-12 mt-12 border-t border-muted">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-24">
-          <div className="col-span-1 md:col-span-2">
-            <div className="font-sans font-bold text-primary tracking-tight text-3xl mb-4">DR LAWN</div>
-            <p className="text-primary/50 text-balance max-w-sm">Premium lawn growing and restoration services. Nelson/Tasman region of New Zealand.</p>
-          </div>
-          <div>
-            <h4 className="font-mono text-sm text-primary/40 mb-6 uppercase tracking-widest">Navigation</h4>
-            <ul className="flex flex-col gap-4 text-primary/80">
-              <li><a href="#features" className="hover:text-accent transition-colors">Features</a></li>
-              <li><a href="#philosophy" className="hover:text-accent transition-colors">Philosophy</a></li>
-              <li><a href="#protocol" className="hover:text-accent transition-colors">Protocol</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-mono text-sm text-primary/40 mb-6 uppercase tracking-widest">Legal</h4>
-            <ul className="flex flex-col gap-4 text-primary/80">
-              <li><a href="#" className="hover:text-accent transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Terms of Service</a></li>
-            </ul>
-          </div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto pt-8 border-t border-muted/50 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3 bg-surface px-4 py-2 rounded-full border border-muted">
-            <div className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_#4A7C59]"></div>
-            <span className="font-mono text-xs text-primary/70 uppercase tracking-wider">System Operational</span>
-          </div>
-          <div className="font-mono text-xs text-primary/40">
-            &copy; {new Date().getFullYear()} Dr Lawn. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </>
-  );
-};
-
-export default function App() {
-  return (
-    <div className="bg-background min-h-screen text-primary selection:bg-accent selection:text-white">
-      <Navbar />
-      <Hero />
-      <Features />
-      <Philosophy />
-      <Protocol />
-      <Footer />
-    </div>
-  );
-}

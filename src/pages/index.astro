@@ -1,0 +1,78 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { ArrowUpRight } from 'lucide-react';
+import { Navbar, Hero, ShufflerCard, TypewriterCard, SchedulerCard, Philosophy, Protocol } from '../components/ReactIslands';
+import '../styles/global.css';
+---
+
+<Layout>
+  <Navbar client:load />
+  <Hero client:load />
+  
+  <section id="features" class="py-32 px-8 md:px-16 w-full max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="flex flex-col gap-6">
+        <h3 class="font-sans font-bold text-2xl">Premium lawn growth.</h3>
+        <p class="text-primary/60 text-sm">Engineered density and colour optimization for luxury residential turf.</p>
+        <ShufflerCard client:visible />
+      </div>
+      <div class="flex flex-col gap-6">
+        <h3 class="font-sans font-bold text-2xl">Lawn rescue and care.</h3>
+        <p class="text-primary/60 text-sm">Systematic eradication of pathogens, weeds, and compacted soil trauma.</p>
+        <TypewriterCard client:visible />
+      </div>
+      <div class="flex flex-col gap-6">
+        <h3 class="font-sans font-bold text-2xl">Soil tests & limits.</h3>
+        <p class="text-primary/60 text-sm">Comprehensive biological profiling shaping custom fertiliser programs.</p>
+        <SchedulerCard client:visible />
+      </div>
+    </div>
+  </section>
+
+  <Philosophy client:visible />
+  <Protocol client:visible />
+
+  <section id="contact" class="py-32 px-8 flex flex-col items-center justify-center text-center">
+    <h2 class="font-drama italic text-5xl md:text-7xl mb-12">Begin your lawn transformation.</h2>
+    <a href="mailto:hello@drlawn.co.nz" class="relative overflow-hidden group bg-primary text-background hover:text-white px-12 py-5 rounded-full text-lg font-bold transition-transform transform hover:scale-[1.03] duration-300">
+      <span class="relative z-10 flex items-center gap-3">Get in touch 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+      </span>
+      <div class="absolute inset-0 bg-accent translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
+    </a>
+  </section>
+
+  <footer class="bg-dark rounded-t-[4rem] px-8 md:px-16 pt-24 pb-12 mt-12 border-t border-muted">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-24">
+      <div class="col-span-1 md:col-span-2">
+        <div class="font-sans font-bold text-primary tracking-tight text-3xl mb-4">DR LAWN</div>
+        <p class="text-primary/50 text-balance max-w-sm">Premium lawn growing and restoration services. Nelson/Tasman region of New Zealand.</p>
+      </div>
+      <div>
+        <h4 class="font-mono text-sm text-primary/40 mb-6 uppercase tracking-widest">Navigation</h4>
+        <ul class="flex flex-col gap-4 text-primary/80">
+          <li><a href="#features" class="hover:text-accent transition-colors">Features</a></li>
+          <li><a href="#philosophy" class="hover:text-accent transition-colors">Philosophy</a></li>
+          <li><a href="#protocol" class="hover:text-accent transition-colors">Protocol</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-mono text-sm text-primary/40 mb-6 uppercase tracking-widest">Legal</h4>
+        <ul class="flex flex-col gap-4 text-primary/80">
+          <li><a href="#" class="hover:text-accent transition-colors">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-accent transition-colors">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto pt-8 border-t border-muted/50 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3 bg-surface px-4 py-2 rounded-full border border-muted">
+        <div class="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_#4A7C59]"></div>
+        <span class="font-mono text-xs text-primary/70 uppercase tracking-wider">System Operational</span>
+      </div>
+      <div class="font-mono text-xs text-primary/40">
+        &copy; {new Date().getFullYear()} Dr Lawn. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</Layout>
