@@ -1,14 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { ArrowUpRight } from 'lucide-react';
-import { Navbar, Hero, ShufflerCard, TypewriterCard, SchedulerCard, Philosophy, Protocol } from '../components/ReactIslands';
+import { Navbar, Hero, BeforeAfterSlider, ShufflerCard, TypewriterCard, SchedulerCard, Philosophy, Protocol } from '../components/ReactIslands';
 import '../styles/global.css';
 ---
 
 <Layout>
   <Navbar client:load />
   <Hero client:load />
-  
+  <BeforeAfterSlider client:load />
+
   <section id="features" class="py-32 px-8 md:px-16 w-full max-w-7xl mx-auto">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div class="flex flex-col gap-6">

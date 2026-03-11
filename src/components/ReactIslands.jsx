@@ -38,7 +38,181 @@ export const Navbar = () => {
   );
 };
 
-// --- 2. HERO SECTION ---
+// --- 2. BEFORE/AFTER SLIDER ---
+export const BeforeAfterSlider = () => {
+  const containerRef = useRef(null);
+  const sliderContainerRef = useRef(null);
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Auto-animation (subtle oscillation)
+  useGSAP(() => {
+    if (hasInteracted) return;
+
+    const obj = { val: 50 };
+    const tl = gsap.timeline({
+      repeat: -1,
+      yoyo: true,
+      defaults: { ease: 'power2.inOut' }
+    });
+
+    tl.to(obj, {
+      val: 60,
+      duration: 3,
+      onUpdate: () => {
+        if (!hasInteracted) setSliderPosition(obj.val);
+      }
+    })
+    .to(obj, {
+      val: 40,
+      duration: 3,
+      onUpdate: () => {
+        if (!hasInteracted) setSliderPosition(obj.val);
+      }
+    });
+
+    return () => tl.kill();
+  }, { scope: containerRef, dependencies: [hasInteracted] });
+
+  // Entrance animation
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.slider-content', { y: 40, opacity: 0, duration: 1, stagger: 0.15 });
+  }, { scope: containerRef });
+
+  // Drag handling with inline position calculation
+  useEffect(() => {
+    const container = sliderContainerRef.current;
+    if (!container) return;
+
+    let isDragging = false;
+
+    const getPosition = (clientX) => {
+      const rect = container.getBoundingClientRect();
+      const x = clientX - rect.left;
+      return Math.max(0, Math.min(100, (x / rect.width) * 100));
+    };
+
+    const onMouseDown = (e) => {
+      e.preventDefault();
+      isDragging = true;
+      setHasInteracted(true);
+      setSliderPosition(getPosition(e.clientX));
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      setSliderPosition(getPosition(e.clientX));
+    };
+
+    const onMouseUp = () => {
+      isDragging = false;
+    };
+
+    const onTouchStart = (e) => {
+      isDragging = true;
+      setHasInteracted(true);
+      setSliderPosition(getPosition(e.touches[0].clientX));
+    };
+
+    const onTouchMove = (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      setSliderPosition(getPosition(e.touches[0].clientX));
+    };
+
+    const onTouchEnd = () => {
+      isDragging = false;
+    };
+
+    container.addEventListener('mousedown', onMouseDown);
+    container.addEventListener('touchstart', onTouchStart, { passive: false });
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      container.removeEventListener('mousedown', onMouseDown);
+      container.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
+
+  return (
+    <section ref={containerRef} className="relative py-24 px-8 md:px-16 w-full bg-dark">
+      <div className="max-w-6xl mx-auto">
+        {/* Section Header */}
+        <div className="slider-content text-center mb-12">
+          <span className="font-mono text-accent text-sm tracking-widest uppercase block mb-4">
+            Transformation
+          </span>
+          <h2 className="font-drama italic text-5xl md:text-7xl text-primary">
+            See the difference.
+          </h2>
+        </div>
+
+        {/* Slider Container */}
+        <div
+          ref={sliderContainerRef}
+          className="slider-content slider-container relative w-full aspect-[4/3] md:aspect-[16/10] rounded-[2rem] overflow-hidden border border-muted shadow-2xl cursor-ew-resize select-none"
+        >
+          {/* After Image (Background - full width) */}
+          <img
+            src="/images/house1_after.webp"
+            alt="After lawn treatment"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            draggable="false"
+          />
+
+          {/* Before Image (Clipped) */}
+          <div
+            className="absolute inset-0 overflow-hidden pointer-events-none"
+            style={{ width: `${sliderPosition}%` }}
+          >
+            <img
+              src="/images/house1_before.webp"
+              alt="Before lawn treatment"
+              className="absolute top-0 left-0 h-full object-cover"
+              style={{
+                width: sliderContainerRef.current?.offsetWidth || '100vw',
+                maxWidth: 'none'
+              }}
+              draggable="false"
+            />
+          </div>
+
+          {/* Slider Handle */}
+          <div
+            className="absolute top-0 bottom-0 w-1 bg-primary/80 shadow-[0_0_20px_rgba(232,237,232,0.3)] pointer-events-none"
+            style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
+          >
+            {/* Circular Drag Handle */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-primary border-4 border-background flex items-center justify-center shadow-xl">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-background">
+                <polyline points="15 18 9 12 15 6" />
+                <polyline points="9 18 15 12 9 6" transform="translate(6, 0)" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Labels */}
+          <div className="absolute bottom-4 left-4 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full font-mono text-xs text-primary/80 uppercase tracking-wider pointer-events-none">
+            Before
+          </div>
+          <div className="absolute bottom-4 right-4 bg-accent/90 backdrop-blur-sm px-4 py-2 rounded-full font-mono text-xs text-white uppercase tracking-wider pointer-events-none">
+            After
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- 3. HERO SECTION ---
 export const Hero = () => {
   const container = useRef(null);
 

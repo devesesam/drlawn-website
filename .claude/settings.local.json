@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(npx sharp-cli:*)",
+      "Bash(ls -la \"c:\\\\Users\\\\damse\\\\OneDrive\\\\Documents\\\\AntiGravity Workspaces\\\\Websites\\\\DrLawn\\\\website\\\\public\\\\images\"\" && ls -la \"c:UsersdamseOneDriveDocumentsAntiGravity WorkspacesWebsitesDrLawnwebsitehouse1_ \"*)",
+      "Bash(npm run dev)"
+    ]
+  }
+}
