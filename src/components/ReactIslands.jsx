@@ -11,6 +11,8 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -255,32 +257,36 @@ export const Protocol = () => {
       }
     });
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: container.current,
-        start: 'top top',
-        end: `+=${cards.length * 100}%`,
-        pin: true,
-        scrub: 1,
-      }
-    });
+    let mm = gsap.matchMedia();
 
-    cards.forEach((card, index) => {
-      if (index === 0) return; 
-
-      // Animate current card coming up from bottom
-      tl.to(card, {
-        yPercent: 0,
-        ease: 'none',
+    mm.add("(min-width: 320px)", () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top top',
+          end: `+=${cards.length * 100}%`,
+          pin: true,
+          scrub: 1,
+        }
       });
 
-      // Concurrently animate the previous card receding into the background
-      tl.to(cards[index - 1], {
-        scale: 0.9,
-        opacity: 0.3, // Deepened the fade for better overlapping contrast
-        filter: 'blur(10px)',
-        ease: 'none',
-      }, '<');
+      cards.forEach((card, index) => {
+        if (index === 0) return; 
+
+        // Animate current card coming up from bottom
+        tl.to(card, {
+          yPercent: 0,
+          ease: 'none',
+        });
+
+        // Concurrently animate the previous card receding into the background
+        tl.to(cards[index - 1], {
+          scale: 0.9,
+          opacity: 0.3, // Deepened the fade for better overlapping contrast
+          filter: 'blur(10px)',
+          ease: 'none',
+        }, '<');
+      });
     });
 
   }, { scope: container });
